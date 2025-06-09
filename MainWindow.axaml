@@ -1,0 +1,91 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:models="using:ProtankiProxy.Models"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="ProtankiProxy.MainWindow"
+        Title="ProtankiProxy"
+        Background="#181A1B">
+    <Grid RowDefinitions="Auto * 6 200" ColumnDefinitions="800 6 *">
+        <!-- Menu Bar -->
+        <Menu Grid.Row="0" Grid.ColumnSpan="3" Background="#23272A">
+            <MenuItem Header="Settings" Foreground="White">
+                <MenuItem Header="Connection Settings" Click="OnConnectionSettingsClick" Foreground="White"/>
+            </MenuItem>
+        </Menu>
+        <!-- Left: List of packets -->
+        <Border Grid.Row="1" Grid.Column="0" Background="#23272A" CornerRadius="4" Margin="5">
+            <Grid RowDefinitions="*, Auto">
+                <DataGrid x:Name="PacketList" 
+                          Grid.Row="0"
+                          Background="Transparent" 
+                          Foreground="White"
+                          SelectionChanged="OnPacketSelected"
+                          IsReadOnly="True"
+                          GridLinesVisibility="All"
+                          BorderThickness="1" 
+                          BorderBrush="#2C2F33"
+                          x:DataType="models:PacketListItem">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Time" Binding="{Binding Timestamp, StringFormat='{}{0:HH:mm:ss.fff}'}" Width="130"/>
+                        <DataGridTextColumn Header="Source" Binding="{Binding Source}" Width="*"/>
+                        <DataGridTextColumn Header="Destination" Binding="{Binding Destination}" Width="*"/>
+                        <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="*"/>
+                        <DataGridTextColumn Header="Size" Binding="{Binding Size, StringFormat='{}{0} bytes'}" Width="120"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+                <CheckBox Grid.Row="1" 
+                          x:Name="AutoScrollCheckBox"
+                          Content="Auto-scroll to bottom"
+                          IsChecked="True"
+                          Foreground="White"
+                          Margin="5"/>
+            </Grid>
+        </Border>
+        <!-- Vertical splitter between left and right -->
+        <GridSplitter Grid.Row="1" Grid.Column="1" Width="6" Background="#2C2F33" ShowsPreview="True"/>
+        <!-- Right: Info of selected packet -->
+        <Border Grid.Row="1" Grid.Column="2" Background="#23272A" CornerRadius="4" Margin="5">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="10">
+                <TextBlock Text="Packet Info" FontWeight="Bold" FontSize="18" Foreground="White"/>
+                    <TextBox x:Name="PacketInfo" 
+                            IsReadOnly="True"
+                            TextWrapping="Wrap"
+                            Background="Transparent"
+                            Foreground="White"
+                            Margin="0,10,0,0"/>
+                    <TextBlock Text="Raw Hex View" FontWeight="Bold" FontSize="18" Foreground="White" Margin="0,20,0,0"/>
+                    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                        <TextBox x:Name="HexView" 
+                                IsReadOnly="True"
+                                TextWrapping="NoWrap"
+                                Background="Transparent"
+                                Foreground="White"
+                                Margin="0,10,0,0"/>
+                    </ScrollViewer>
+                    <TextBlock Text="Decrypted Hex View" FontWeight="Bold" FontSize="18" Foreground="White" Margin="0,20,0,0"/>
+                    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                        <TextBox x:Name="DecryptedHexView" 
+                                IsReadOnly="True"
+                                TextWrapping="NoWrap"
+                                Background="Transparent"
+                                Foreground="White"
+                                Margin="0,10,0,0"/>
+                    </ScrollViewer>
+            </StackPanel>
+            </ScrollViewer>
+        </Border>
+        <!-- Horizontal splitter between main and console -->
+        <GridSplitter Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Height="6" Background="#2C2F33" ShowsPreview="True"/>
+        <!-- Bottom: Console -->
+        <Border Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" Background="#23272A" CornerRadius="4" Margin="5">
+            <TextBox x:Name="ConsoleOutput"
+                     IsReadOnly="True"
+                     TextWrapping="Wrap"
+                     Background="Transparent"
+                     Foreground="White"/>
+        </Border>
+    </Grid>
+</Window>
