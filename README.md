@@ -4,6 +4,8 @@
 
 A proxy tool for intercepting and analyzing Protanki game traffic. This tool allows you to monitor and analyze the network communication between the Protanki client and server.
 
+This project uses [ProtankiNetworking](https://github.com/juhe1/ProtankiNetworking) library for handling the game's network communication.
+
 ## Features
 
 - Real-time packet interception and monitoring
@@ -13,7 +15,7 @@ A proxy tool for intercepting and analyzing Protanki game traffic. This tool all
 
 ## Requirements
 
-- .NET 7.0 or later
+- .NET 8.0 or later
 - Windows operating system
 - Protanki game client
 
@@ -49,4 +51,19 @@ Settings are saved between sessions.
 ## Building from Source
 
 1. Clone the repository
-2. Run `dotnet build` command in cmd.
+2. Clone the ProtankiNetworking repository:
+   ```bash
+   git clone https://github.com/juhe1/ProtankiNetworking.git
+   ```
+3. Build ProtankiNetworking:
+   ```bash
+   cd ProtankiNetworking
+   dotnet build
+   ```
+4. Build ProtankiProxy:
+   ```bash
+   cd ../ProtankiProxy
+   dotnet build -c Release
+   ```
+
+The application will be built as a self-contained executable that doesn't require .NET runtime to be installed.
