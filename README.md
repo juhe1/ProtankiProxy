@@ -51,18 +51,8 @@ Settings are saved between sessions.
 ## Building from Source
 
 1. Clone the repository
-2. Clone the ProtankiNetworking repository:
+2. Build ProtankiProxy:
    ```bash
-   git clone https://github.com/juhe1/ProtankiNetworking.git
-   ```
-3. Build ProtankiNetworking:
-   ```bash
-   cd ProtankiNetworking
-   dotnet build
-   ```
-4. Build ProtankiProxy:
-   ```bash
-   cd ../ProtankiProxy
    dotnet build -c Release
    ```
 
