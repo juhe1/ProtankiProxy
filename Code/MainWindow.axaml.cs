@@ -31,6 +31,8 @@ public partial class MainWindow : Window
     private CancellationTokenSource _cancellationTokenSource;
     private ObservableCollection<PacketListItem> _packets;
     private CheckBox _autoScrollCheckBox;
+    private TextBox _packetSearchBox;
+    private ObservableCollection<PacketListItem> _filteredPackets;
 
     public MainWindow()
     {
@@ -39,6 +41,7 @@ public partial class MainWindow : Window
         InitializePacketList();
         _cancellationTokenSource = new CancellationTokenSource();
         LoadSettings();
+        InitializeSearch();
     }
 
     private void InitializeLogging()
@@ -75,11 +78,46 @@ public partial class MainWindow : Window
     private void InitializePacketList()
     {
         _packets = new ObservableCollection<PacketListItem>();
+        _filteredPackets = new ObservableCollection<PacketListItem>();
+        _packetList = this.FindControl<DataGrid>("PacketList");
         if (_packetList != null)
         {
-            _packetList.ItemsSource = _packets;
+            _packetList.ItemsSource = _filteredPackets;
         }
         _autoScrollCheckBox = this.FindControl<CheckBox>("AutoScrollCheckBox");
+    }
+
+    private void InitializeSearch()
+    {
+        _packetSearchBox = this.FindControl<TextBox>("PacketSearchBox");
+        if (_packetSearchBox != null)
+        {
+            _packetSearchBox.TextChanged += PacketSearchBox_TextChanged;
+        }
+    }
+
+    private void PacketSearchBox_TextChanged(object sender, EventArgs e)
+    {
+        ApplyPacketFilter();
+    }
+
+    private void ApplyPacketFilter()
+    {
+        if (_packetSearchBox == null)
+            return;
+        string search = _packetSearchBox.Text?.Trim() ?? string.Empty;
+        _filteredPackets.Clear();
+        var filtered = string.IsNullOrEmpty(search)
+            ? _packets
+            : _packets.Where(p =>
+                (p.Timestamp.ToString("HH:mm:ss.fff").Contains(search, StringComparison.OrdinalIgnoreCase)) ||
+                (p.Source?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (p.Destination?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (p.Type?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (p.Size.ToString().Contains(search))
+            );
+        foreach (var item in filtered)
+            _filteredPackets.Add(item);
     }
 
     private void WriteToConsole(string message)
@@ -108,6 +146,7 @@ public partial class MainWindow : Window
             };
 
             _packets.Add(packetItem);
+            ApplyPacketFilter();
 
             // Auto-scroll to bottom if enabled
             if (_autoScrollCheckBox?.IsChecked == true && _packetList != null)

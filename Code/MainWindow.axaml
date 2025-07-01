@@ -16,9 +16,18 @@
         </Menu>
         <!-- Left: List of packets -->
         <Border Grid.Row="1" Grid.Column="0" Background="#23272A" CornerRadius="4" Margin="5">
-            <Grid RowDefinitions="*, Auto">
+            <Grid RowDefinitions="Auto,*,Auto">
+                <TextBox x:Name="PacketSearchBox"
+                         Grid.Row="0"
+                         Watermark="Search packets..."
+                         Margin="5"
+                         Background="#23272A"
+                         Foreground="White"
+                         BorderBrush="#2C2F33"
+                         BorderThickness="1"
+                         />
                 <DataGrid x:Name="PacketList" 
-                          Grid.Row="0"
+                          Grid.Row="1"
                           Background="Transparent" 
                           Foreground="White"
                           SelectionChanged="OnPacketSelected"
@@ -35,7 +44,7 @@
                         <DataGridTextColumn Header="Size" Binding="{Binding Size, StringFormat='{}{0} bytes'}" Width="120"/>
                     </DataGrid.Columns>
                 </DataGrid>
-                <CheckBox Grid.Row="1" 
+                <CheckBox Grid.Row="2" 
                           x:Name="AutoScrollCheckBox"
                           Content="Auto-scroll to bottom"
                           IsChecked="True"
