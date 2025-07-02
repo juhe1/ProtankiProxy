@@ -14,6 +14,7 @@ using ProtankiProxy.Logging;
 using ProtankiProxy.Models;
 using ProtankiProxy.Settings;
 using Serilog;
+using Newtonsoft.Json.Converters;
 
 namespace ProtankiProxy;
 
@@ -33,6 +34,11 @@ public partial class MainWindow : Window
     private CheckBox _autoScrollCheckBox;
     private TextBox _packetSearchBox;
     private ObservableCollection<PacketListItem> _filteredPackets;
+    private static JsonSerializerSettings jsonSerializerSettings = new JsonSerializerSettings
+	{
+		Formatting = Formatting.Indented,
+		TypeNameHandling = TypeNameHandling.Objects,
+	};
 
     public MainWindow()
     {
@@ -42,6 +48,9 @@ public partial class MainWindow : Window
         _cancellationTokenSource = new CancellationTokenSource();
         LoadSettings();
         InitializeSearch();
+
+        // Add StringEnumConverter to the serializer settings
+        jsonSerializerSettings.Converters.Add(new StringEnumConverter());
     }
 
     private void InitializeLogging()
@@ -250,7 +259,7 @@ public partial class MainWindow : Window
                     } else
                     {
                         infoSb.AppendLine($"{kvp.Key}:");
-                        var json = JsonConvert.SerializeObject(kvp.Value, Formatting.Indented);
+                        var json = JsonConvert.SerializeObject(kvp.Value, jsonSerializerSettings);
                         infoSb.AppendLine(json);
                         infoSb.AppendLine();
                     }
