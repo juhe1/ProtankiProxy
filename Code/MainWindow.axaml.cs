@@ -105,19 +105,27 @@ public partial class MainWindow : Window
     {
         if (_packetSearchBox == null)
             return;
+        var selectedItem = _packetList?.SelectedItem as PacketListItem;
         string search = _packetSearchBox.Text?.Trim() ?? string.Empty;
         _filteredPackets.Clear();
         var filtered = string.IsNullOrEmpty(search)
             ? _packets
-            : _packets.Where(p =>
-                (p.Timestamp.ToString("HH:mm:ss.fff").Contains(search, StringComparison.OrdinalIgnoreCase)) ||
-                (p.Source?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false) ||
-                (p.Destination?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false) ||
-                (p.Type?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false) ||
-                (p.Size.ToString().Contains(search))
-            );
+            : _packets.Where(p => PacketMatchesSearch(p, search));
         foreach (var item in filtered)
             _filteredPackets.Add(item);
+        if (selectedItem != null && _filteredPackets.Contains(selectedItem))
+        {
+            _packetList.SelectedItem = selectedItem;
+        }
+    }
+
+    private bool PacketMatchesSearch(PacketListItem p, string search)
+    {
+        return (p.Timestamp.ToString("HH:mm:ss.fff").Contains(search, StringComparison.OrdinalIgnoreCase)) ||
+               (p.Source?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false) ||
+               (p.Destination?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false) ||
+               (p.Type?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false) ||
+               (p.Size.ToString().Contains(search));
     }
 
     private void WriteToConsole(string message)
@@ -146,15 +154,18 @@ public partial class MainWindow : Window
             };
 
             _packets.Add(packetItem);
-            ApplyPacketFilter();
+            // Only add to filteredPackets if it matches the current search
+            string search = _packetSearchBox?.Text?.Trim() ?? string.Empty;
+            if (string.IsNullOrEmpty(search) || PacketMatchesSearch(packetItem, search))
+            {
+                _filteredPackets.Add(packetItem);
+            }
 
             // Auto-scroll to bottom if enabled
             if (_autoScrollCheckBox?.IsChecked == true && _packetList != null)
             {
-                // Schedule the scroll operation for the next UI update
                 Dispatcher.UIThread.Post(() =>
                 {
-                    // Get the last column to scroll to
                     var lastColumn = _packetList.Columns.LastOrDefault();
                     if (lastColumn != null)
                     {
