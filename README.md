@@ -57,3 +57,13 @@ Settings are saved between sessions.
    ```
 
 The application will be built as a self-contained executable that doesn't require .NET runtime to be installed.
+
+## Download
+
+Pre-built binaries for Windows, Linux, and macOS are available on the [Releases page](https://github.com/juhe1/ProtankiProxy/releases).
+
+1. Go to the [ProtankiProxy Releases](https://github.com/juhe1/ProtankiProxy/releases)
+2. Download the appropriate binary for your operating system (Windows, Linux, or macOS)
+3. Extract the archive and run the executable
+
+No manual build is required if you use the pre-built binaries.
