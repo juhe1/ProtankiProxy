@@ -35,11 +35,17 @@ jobs:
     - name: Publish app
       run: dotnet publish -c Release -r ${{ matrix.runtime }} --self-contained true -o publish
 
-    - name: Rename and zip
+    - name: Zip for Unix
+      if: runner.os != 'Windows'
       run: |
         cd publish
         zip -r ../${{ matrix.zip_name }} .
       shell: bash
+
+    - name: Zip for Windows
+      if: runner.os == 'Windows'
+      shell: pwsh
+      run: Compress-Archive -Path publish\* -DestinationPath ${{ matrix.zip_name }}
 
     - name: Upload to GitHub Release
       uses: softprops/action-gh-release@v2
