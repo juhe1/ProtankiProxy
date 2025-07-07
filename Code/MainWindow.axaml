@@ -40,7 +40,7 @@
                         <DataGridTextColumn Header="Time" Binding="{Binding Timestamp, StringFormat='{}{0:HH:mm:ss.fff}'}" Width="130"/>
                         <DataGridTextColumn Header="Source" Binding="{Binding Source}" Width="*"/>
                         <DataGridTextColumn Header="Destination" Binding="{Binding Destination}" Width="*"/>
-                        <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="*"/>
+                        <DataGridTextColumn Header="Type" Binding="{Binding TypeWithId}" Width="*"/>
                         <DataGridTextColumn Header="Size" Binding="{Binding Size, StringFormat='{}{0} bytes'}" Width="120"/>
                     </DataGrid.Columns>
                 </DataGrid>

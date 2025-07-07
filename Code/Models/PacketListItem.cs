@@ -12,6 +12,8 @@ namespace ProtankiProxy.Models
         public string Type { get; set; }
         public AbstractPacket Packet { get; set; }
 
+        public string TypeWithId => Packet != null ? $"{Type} (ID: {Packet.Id})" : Type;
+
         public override string ToString()
         {
             return $"[{Timestamp:HH:mm:ss.fff}] {Source} -> {Destination} | {Type} ({Size} bytes)";
