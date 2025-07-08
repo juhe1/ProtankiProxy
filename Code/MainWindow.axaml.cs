@@ -5,6 +5,7 @@ using System.Text.Json.Nodes;
 using System.Threading;
 using System.Linq;
 using Avalonia.Controls;
+using Avalonia.Controls.Models.TreeDataGrid;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -25,7 +26,7 @@ public partial class MainWindow : Window
     private IPEndPoint _serverEndPoint;
     private ConnectionSettings _settings;
     private TextBox _consoleOutput;
-    private DataGrid _packetList;
+    private TreeDataGrid _packetList;
     private TextBox _packetInfo;
     private TextBox _hexView;
     private TextBox _decryptedHexView;
@@ -34,6 +35,7 @@ public partial class MainWindow : Window
     private CheckBox _autoScrollCheckBox;
     private TextBox _packetSearchBox;
     private ObservableCollection<PacketListItem> _filteredPackets;
+    private FlatTreeDataGridSource<PacketListItem> _treeDataGridSource;
     private static JsonSerializerSettings jsonSerializerSettings = new JsonSerializerSettings
 	{
 		Formatting = Formatting.Indented,
@@ -57,7 +59,7 @@ public partial class MainWindow : Window
     {
         // Find the console output TextBox
         _consoleOutput = this.FindControl<TextBox>("ConsoleOutput");
-        _packetList = this.FindControl<DataGrid>("PacketList");
+        _packetList = this.FindControl<TreeDataGrid>("PacketList");
         _packetInfo = this.FindControl<TextBox>("PacketInfo");
         _hexView = this.FindControl<TextBox>("HexView");
         _decryptedHexView = this.FindControl<TextBox>("DecryptedHexView");
@@ -88,10 +90,32 @@ public partial class MainWindow : Window
     {
         _packets = new ObservableCollection<PacketListItem>();
         _filteredPackets = new ObservableCollection<PacketListItem>();
-        _packetList = this.FindControl<DataGrid>("PacketList");
+        _packetList = this.FindControl<TreeDataGrid>("PacketList");
+        
+        // Create the TreeDataGrid source
+        _treeDataGridSource = new FlatTreeDataGridSource<PacketListItem>(_filteredPackets)
+        {
+            Columns =
+            {
+                new TextColumn<PacketListItem, DateTime>("Time", x => x.Timestamp, width: new GridLength(130)),
+                new TextColumn<PacketListItem, string>("Source", x => x.Source),
+                new TextColumn<PacketListItem, string>("Destination", x => x.Destination),
+                new TextColumn<PacketListItem, string>("Type", x => x.TypeWithId),
+                new TextColumn<PacketListItem, int>("Size", x => x.Size, width: new GridLength(120)),
+            },
+        };
+
         if (_packetList != null)
         {
-            _packetList.ItemsSource = _filteredPackets;
+            _packetList.Source = _treeDataGridSource;
+            _packetList.RowSelection.SelectionChanged += (s, e) =>
+            {
+                var selected = _packetList.RowSelection.SelectedItems;
+                if (selected.Count > 0 && selected[0] is PacketListItem selectedPacket)
+                {
+                    OnPacketSelected(selectedPacket);
+                }
+            };
         }
         _autoScrollCheckBox = this.FindControl<CheckBox>("AutoScrollCheckBox");
     }
@@ -114,7 +138,6 @@ public partial class MainWindow : Window
     {
         if (_packetSearchBox == null)
             return;
-        var selectedItem = _packetList?.SelectedItem as PacketListItem;
         string search = _packetSearchBox.Text?.Trim() ?? string.Empty;
         _filteredPackets.Clear();
         var filtered = string.IsNullOrEmpty(search)
@@ -122,10 +145,6 @@ public partial class MainWindow : Window
             : _packets.Where(p => PacketMatchesSearch(p, search));
         foreach (var item in filtered)
             _filteredPackets.Add(item);
-        if (selectedItem != null && _filteredPackets.Contains(selectedItem))
-        {
-            _packetList.SelectedItem = selectedItem;
-        }
     }
 
     private bool PacketMatchesSearch(PacketListItem p, string search)
@@ -133,7 +152,7 @@ public partial class MainWindow : Window
         return (p.Timestamp.ToString("HH:mm:ss.fff").Contains(search, StringComparison.OrdinalIgnoreCase)) ||
                (p.Source?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false) ||
                (p.Destination?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false) ||
-               (p.TypeWithId?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false) ||
+               (p.Type?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false) ||
                (p.Size.ToString().Contains(search));
     }
 
@@ -175,11 +194,7 @@ public partial class MainWindow : Window
             {
                 Dispatcher.UIThread.Post(() =>
                 {
-                    var lastColumn = _packetList.Columns.LastOrDefault();
-                    if (lastColumn != null)
-                    {
-                        _packetList.ScrollIntoView(packetItem, lastColumn);
-                    }
+                    _packetList.Scroll.Offset = _packetList.Scroll.Offset.WithY(_packetList.Scroll.Extent.Height);
                 }, DispatcherPriority.Loaded);
             }
         });
@@ -229,51 +244,48 @@ public partial class MainWindow : Window
         return sb.ToString();
     }
 
-    private void OnPacketSelected(object sender, SelectionChangedEventArgs e)
+    private void OnPacketSelected(PacketListItem selectedPacket)
     {
-        if (e.AddedItems.Count > 0 && e.AddedItems[0] is PacketListItem selectedPacket)
-        {
-            var packet = selectedPacket.Packet;
-            var infoSb = new System.Text.StringBuilder();
-            
-            // Add packet type and ID
-            infoSb.AppendLine($"Packet Type: {packet.GetType().Name}");
-            infoSb.AppendLine($"Packet ID: {packet.Id}");
-            infoSb.AppendLine($"Description: {packet.GetType().GetProperty("Description", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)?.GetValue(null)}");
-            infoSb.AppendLine();
+        var packet = selectedPacket.Packet;
+        var infoSb = new System.Text.StringBuilder();
+        
+        // Add packet type and ID
+        infoSb.AppendLine($"Packet Type: {packet.GetType().Name}");
+        infoSb.AppendLine($"Packet ID: {packet.Id}");
+        infoSb.AppendLine($"Description: {packet.GetType().GetProperty("Description", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)?.GetValue(null)}");
+        infoSb.AppendLine();
 
-            // Add each attribute and its value
-            if (packet.ObjectByAttributeName.Count > 0)
+        // Add each attribute and its value
+        if (packet.ObjectByAttributeName.Count > 0)
+        {
+            foreach (var kvp in packet.ObjectByAttributeName)
             {
-                foreach (var kvp in packet.ObjectByAttributeName)
+                if (kvp.Value is JsonNode)
                 {
-                    if (kvp.Value is JsonNode)
-                    {
-                        infoSb.AppendLine($"{kvp.Key}:");
-                        var json = ((JsonNode)kvp.Value).ToJsonString(new System.Text.Json.JsonSerializerOptions 
-                        { 
-                            WriteIndented = true 
-                        });
-                        infoSb.AppendLine(json);
-                        infoSb.AppendLine();
-                    } else
-                    {
-                        infoSb.AppendLine($"{kvp.Key}:");
-                        var json = JsonConvert.SerializeObject(kvp.Value, jsonSerializerSettings);
-                        infoSb.AppendLine(json);
-                        infoSb.AppendLine();
-                    }
+                    infoSb.AppendLine($"{kvp.Key}:");
+                    var json = ((JsonNode)kvp.Value).ToJsonString(new System.Text.Json.JsonSerializerOptions 
+                    { 
+                        WriteIndented = true 
+                    });
+                    infoSb.AppendLine(json);
+                    infoSb.AppendLine();
+                } else
+                {
+                    infoSb.AppendLine($"{kvp.Key}:");
+                    var json = JsonConvert.SerializeObject(kvp.Value, Formatting.Indented);
+                    infoSb.AppendLine(json);
+                    infoSb.AppendLine();
                 }
             }
-            else
-            {
-                infoSb.AppendLine("No attributes found in packet.");
-            }
-
-            _packetInfo.Text = infoSb.ToString();
-            _hexView.Text = CreateHexDump(packet.RawData);
-            _decryptedHexView.Text = CreateHexDump(packet.DecryptedData);
         }
+        else
+        {
+            infoSb.AppendLine("No attributes found in packet.");
+        }
+
+        _packetInfo.Text = infoSb.ToString();
+        _hexView.Text = CreateHexDump(packet.RawData);
+        _decryptedHexView.Text = CreateHexDump(packet.DecryptedData);
     }
 
     private async void LoadSettings()

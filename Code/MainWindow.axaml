@@ -26,24 +26,12 @@
                          BorderBrush="#2C2F33"
                          BorderThickness="1"
                          />
-                <DataGrid x:Name="PacketList" 
-                          Grid.Row="1"
-                          Background="Transparent" 
-                          Foreground="White"
-                          SelectionChanged="OnPacketSelected"
-                          IsReadOnly="True"
-                          GridLinesVisibility="All"
-                          BorderThickness="1" 
-                          BorderBrush="#2C2F33"
-                          x:DataType="models:PacketListItem">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Time" Binding="{Binding Timestamp, StringFormat='{}{0:HH:mm:ss.fff}'}" Width="130"/>
-                        <DataGridTextColumn Header="Source" Binding="{Binding Source}" Width="*"/>
-                        <DataGridTextColumn Header="Destination" Binding="{Binding Destination}" Width="*"/>
-                        <DataGridTextColumn Header="Type" Binding="{Binding TypeWithId}" Width="*"/>
-                        <DataGridTextColumn Header="Size" Binding="{Binding Size, StringFormat='{}{0} bytes'}" Width="120"/>
-                    </DataGrid.Columns>
-                </DataGrid>
+                <TreeDataGrid x:Name="PacketList" 
+                             Grid.Row="1"
+                             Background="Transparent" 
+                             Foreground="White"
+                             BorderThickness="1" 
+                             BorderBrush="#2C2F33"/>
                 <CheckBox Grid.Row="2" 
                           x:Name="AutoScrollCheckBox"
                           Content="Auto-scroll to bottom"
