@@ -152,7 +152,7 @@ public partial class MainWindow : Window
         return (p.Timestamp.ToString("HH:mm:ss.fff").Contains(search, StringComparison.OrdinalIgnoreCase)) ||
                (p.Source?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false) ||
                (p.Destination?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false) ||
-               (p.Type?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false) ||
+               (p.TypeWithId?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false) ||
                (p.Size.ToString().Contains(search));
     }
 
