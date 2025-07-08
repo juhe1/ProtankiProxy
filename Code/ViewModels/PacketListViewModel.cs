@@ -21,9 +21,9 @@ namespace ProtankiProxy.ViewModels
                 Columns =
                 {
                     new TextColumn<PacketListItem, DateTime>("Time", x => x.Timestamp, width: new Avalonia.Controls.GridLength(130)),
-                    new TextColumn<PacketListItem, string>("Source", x => x.Source),
-                    new TextColumn<PacketListItem, string>("Destination", x => x.Destination),
-                    new TextColumn<PacketListItem, string>("Type", x => x.TypeWithId),
+                    new TextColumn<PacketListItem, string>("Source", x => x.Source, width: new Avalonia.Controls.GridLength(130)),
+                    new TextColumn<PacketListItem, string>("Destination", x => x.Destination, width: new Avalonia.Controls.GridLength(130)),
+                    new TextColumn<PacketListItem, string>("Type", x => x.TypeWithId, width: new Avalonia.Controls.GridLength(130)),
                     new TextColumn<PacketListItem, int>("Size", x => x.Size, width: new Avalonia.Controls.GridLength(120)),
                 },
             };
