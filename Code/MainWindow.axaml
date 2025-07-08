@@ -3,86 +3,27 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:models="using:ProtankiProxy.Models"
+        xmlns:views="using:ProtankiProxy.Views"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="ProtankiProxy.MainWindow"
         Title="ProtankiProxy"
-        Background="#181A1B">
-    <Grid RowDefinitions="Auto * 6 200" ColumnDefinitions="800 6 *">
+        Background="#2C2F33">
+    <Grid Margin="8,0,8,8" RowDefinitions="Auto * 6 200" ColumnDefinitions="800 6 *">
         <!-- Menu Bar -->
         <Menu Grid.Row="0" Grid.ColumnSpan="3" Background="#23272A">
             <MenuItem Header="Settings" Foreground="White">
                 <MenuItem Header="Connection Settings" Click="OnConnectionSettingsClick" Foreground="White"/>
             </MenuItem>
         </Menu>
-        <!-- Left: List of packets -->
-        <Border Grid.Row="1" Grid.Column="0" Background="#23272A" CornerRadius="4" Margin="5">
-            <Grid RowDefinitions="Auto,*,Auto">
-                <TextBox x:Name="PacketSearchBox"
-                         Grid.Row="0"
-                         Watermark="Search packets..."
-                         Margin="5"
-                         Background="#23272A"
-                         Foreground="White"
-                         BorderBrush="#2C2F33"
-                         BorderThickness="1"
-                         />
-                <TreeDataGrid x:Name="PacketList" 
-                             Grid.Row="1"
-                             Background="Transparent" 
-                             Foreground="White"
-                             BorderThickness="1" 
-                             BorderBrush="#2C2F33"/>
-                <CheckBox Grid.Row="2" 
-                          x:Name="AutoScrollCheckBox"
-                          Content="Auto-scroll to bottom"
-                          IsChecked="True"
-                          Foreground="White"
-                          Margin="5"/>
-            </Grid>
-        </Border>
+        <!-- Left: Packet List Panel -->
+        <views:PacketListPanel x:Name="PacketListPanel" Grid.Row="1" Grid.Column="0" />
         <!-- Vertical splitter between left and right -->
         <GridSplitter Grid.Row="1" Grid.Column="1" Width="6" Background="#2C2F33" ShowsPreview="True"/>
-        <!-- Right: Info of selected packet -->
-        <Border Grid.Row="1" Grid.Column="2" Background="#23272A" CornerRadius="4" Margin="5">
-            <ScrollViewer VerticalScrollBarVisibility="Auto">
-            <StackPanel Margin="10">
-                <TextBlock Text="Packet Info" FontWeight="Bold" FontSize="18" Foreground="White"/>
-                    <TextBox x:Name="PacketInfo" 
-                            IsReadOnly="True"
-                            TextWrapping="Wrap"
-                            Background="Transparent"
-                            Foreground="White"
-                            Margin="0,10,0,0"/>
-                    <TextBlock Text="Raw Hex View" FontWeight="Bold" FontSize="18" Foreground="White" Margin="0,20,0,0"/>
-                    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                        <TextBox x:Name="HexView" 
-                                IsReadOnly="True"
-                                TextWrapping="NoWrap"
-                                Background="Transparent"
-                                Foreground="White"
-                                Margin="0,10,0,0"/>
-                    </ScrollViewer>
-                    <TextBlock Text="Decrypted Hex View" FontWeight="Bold" FontSize="18" Foreground="White" Margin="0,20,0,0"/>
-                    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                        <TextBox x:Name="DecryptedHexView" 
-                                IsReadOnly="True"
-                                TextWrapping="NoWrap"
-                                Background="Transparent"
-                                Foreground="White"
-                                Margin="0,10,0,0"/>
-                    </ScrollViewer>
-            </StackPanel>
-            </ScrollViewer>
-        </Border>
+        <!-- Right: Packet Info Panel -->
+        <views:PacketInfoPanel x:Name="PacketInfoPanel" Grid.Row="1" Grid.Column="2" />
         <!-- Horizontal splitter between main and console -->
         <GridSplitter Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Height="6" Background="#2C2F33" ShowsPreview="True"/>
-        <!-- Bottom: Console -->
-        <Border Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" Background="#23272A" CornerRadius="4" Margin="5">
-            <TextBox x:Name="ConsoleOutput"
-                     IsReadOnly="True"
-                     TextWrapping="Wrap"
-                     Background="Transparent"
-                     Foreground="White"/>
-        </Border>
+        <!-- Bottom: Console Panel -->
+        <views:ConsolePanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" />
     </Grid>
 </Window>

@@ -1,0 +1,33 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="ProtankiProxy.Views.PacketInfoPanel">
+  <ScrollViewer Background="#181A1B" VerticalScrollBarVisibility="Auto">
+    <StackPanel Margin="10">
+      <TextBlock Text="Packet Info" FontWeight="Bold" FontSize="18" Foreground="White"/>
+      <TextBox x:Name="PacketInfo"
+               IsReadOnly="True"
+               TextWrapping="Wrap"
+               Background="Transparent"
+               Foreground="White"
+               Margin="0,10,0,0"/>
+      <TextBlock Text="Raw Hex View" FontWeight="Bold" FontSize="18" Foreground="White" Margin="0,20,0,0"/>
+      <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+        <TextBox x:Name="HexView"
+                 IsReadOnly="True"
+                 TextWrapping="NoWrap"
+                 Background="Transparent"
+                 Foreground="White"
+                 Margin="0,10,0,0"/>
+      </ScrollViewer>
+      <TextBlock Text="Decrypted Hex View" FontWeight="Bold" FontSize="18" Foreground="White" Margin="0,20,0,0"/>
+      <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+        <TextBox x:Name="DecryptedHexView"
+                 IsReadOnly="True"
+                 TextWrapping="NoWrap"
+                 Background="Transparent"
+                 Foreground="White"
+                 Margin="0,10,0,0"/>
+      </ScrollViewer>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl> 

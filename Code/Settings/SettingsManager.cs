@@ -31,6 +31,7 @@ namespace ProtankiProxy.Settings
             catch (Exception ex)
             {
                 Console.WriteLine($"Failed to save settings: {ex.Message}");
+                throw;
             }
         }
 
@@ -47,6 +48,7 @@ namespace ProtankiProxy.Settings
             catch (Exception ex)
             {
                 Console.WriteLine($"Failed to load settings: {ex.Message}");
+                throw;
             }
 
             return new ConnectionSettings();

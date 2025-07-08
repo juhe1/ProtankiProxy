@@ -1,0 +1,10 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="ProtankiProxy.Views.ConsolePanel"
+             Background="#181A1B">
+  <TextBox x:Name="ConsoleOutput"
+           IsReadOnly="True"
+           TextWrapping="Wrap"
+           Background="Transparent"
+           Foreground="White"/>
+</UserControl> 

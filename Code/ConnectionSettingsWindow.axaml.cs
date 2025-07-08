@@ -45,6 +45,7 @@ namespace ProtankiProxy
             {
                 // TODO: Show error message to user
                 Console.WriteLine($"Invalid settings: {ex.Message}");
+                throw;
             }
         }
     }

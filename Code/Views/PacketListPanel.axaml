@@ -1,0 +1,26 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="ProtankiProxy.Views.PacketListPanel">
+  <Grid Margin="0" Background="#181A1B" RowDefinitions="Auto,*,Auto">
+    <TextBox x:Name="PacketSearchBox"
+             Grid.Row="0"
+             Watermark="Search packets..."
+             Margin="5"
+             Background="#23272A"
+             Foreground="White"
+             BorderBrush="#2C2F33"
+             BorderThickness="1"/>
+    <TreeDataGrid x:Name="PacketList"
+                 Grid.Row="1"
+                 Background="Transparent"
+                 Foreground="White"
+                 BorderThickness="1"
+                 BorderBrush="#2C2F33"/>
+    <CheckBox Grid.Row="2"
+              x:Name="AutoScrollCheckBox"
+              Content="Auto-scroll to bottom"
+              IsChecked="True"
+              Foreground="White"
+              Margin="5"/>
+  </Grid>
+</UserControl> 
