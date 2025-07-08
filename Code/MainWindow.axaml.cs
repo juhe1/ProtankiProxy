@@ -10,6 +10,8 @@ using ProtankiProxy.Settings;
 using ProtankiProxy.ViewModels;
 using ProtankiProxy.Views;
 using Serilog;
+using ProtankiNetworking.Packets;
+using System.Collections.Generic;
 
 namespace ProtankiProxy;
 
@@ -23,6 +25,7 @@ public partial class MainWindow : Window
     private PacketInfoPanel? _packetInfoPanel;
     private CancellationTokenSource _cancellationTokenSource;
     private PacketListViewModel _packetListViewModel;
+    private static readonly HashSet<int> _loggedUnknownPacketIds = new();
 
     public MainWindow()
     {
@@ -50,6 +53,13 @@ public partial class MainWindow : Window
 
     private void OnPacketReceived(object? sender, PacketEventArgs e)
     {
+        if (e.Packet is UnknownPacket unknownPacket)
+        {
+            if (_loggedUnknownPacketIds.Add(unknownPacket.Id))
+            {
+                Log.Warning("UnknownPacket received with ID {PacketId}. This warning will only be shown once per ID.", unknownPacket.Id);
+            }
+        }
         Dispatcher.UIThread.Post(() =>
         {
             var packetItem = new PacketListItem
