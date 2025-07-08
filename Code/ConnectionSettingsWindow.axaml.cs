@@ -8,8 +8,10 @@ namespace ProtankiProxy
 {
     public partial class ConnectionSettingsWindow : Window
     {
-        public IPEndPoint LocalEndPoint { get; private set; }
-        public IPEndPoint ServerEndPoint { get; private set; }
+        public IPEndPoint LocalEndPoint { get; private set; } = null!;
+        public IPEndPoint ServerEndPoint { get; private set; } = null!;
+
+        public ConnectionSettingsWindow() : this(new ConnectionSettings()) { }
 
         public ConnectionSettingsWindow(ConnectionSettings currentSettings)
         {
@@ -31,10 +33,15 @@ namespace ProtankiProxy
         {
             try
             {
-                var localIp = IPAddress.Parse(LocalIpTextBox.Text);
-                var localPort = int.Parse(LocalPortTextBox.Text);
-                var serverIp = IPAddress.Parse(ServerIpTextBox.Text);
-                var serverPort = int.Parse(ServerPortTextBox.Text);
+                var localIpText = LocalIpTextBox.Text ?? throw new InvalidOperationException("Local IP is required.");
+                var localPortText = LocalPortTextBox.Text ?? throw new InvalidOperationException("Local port is required.");
+                var serverIpText = ServerIpTextBox.Text ?? throw new InvalidOperationException("Server IP is required.");
+                var serverPortText = ServerPortTextBox.Text ?? throw new InvalidOperationException("Server port is required.");
+
+                var localIp = IPAddress.Parse(localIpText);
+                var localPort = int.Parse(localPortText);
+                var serverIp = IPAddress.Parse(serverIpText);
+                var serverPort = int.Parse(serverPortText);
 
                 LocalEndPoint = new IPEndPoint(localIp, localPort);
                 ServerEndPoint = new IPEndPoint(serverIp, serverPort);

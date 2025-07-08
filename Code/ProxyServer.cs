@@ -32,7 +32,7 @@ namespace ProtankiProxy
         /// <summary>
         /// Event that is raised when a packet is received from either a client or the server.
         /// </summary>
-        public event EventHandler<PacketEventArgs> PacketReceived;
+        public event EventHandler<PacketEventArgs>? PacketReceived;
 
         /// <summary>
         /// Creates a new instance of ProxyServer.
@@ -53,19 +53,38 @@ namespace ProtankiProxy
             return new ProxyClientHandler(client, new IPEndPoint(IPAddress.Parse(_serverAddress), _serverPort), new Protection(true), cancellationToken, this);
         }
 
-        protected override async Task OnClientConnectedAsync(TcpClient client)
+        protected override Task OnClientConnectedAsync(TcpClient client)
         {
-            Log.Information("Client connected from {Address}", ((IPEndPoint)client.Client.RemoteEndPoint).Address);
+            var remoteEndPoint = client.Client.RemoteEndPoint as IPEndPoint;
+            if (remoteEndPoint != null)
+            {
+                Log.Information("Client connected from {Address}", remoteEndPoint.Address);
+            }
+            else
+            {
+                Log.Information("Client connected from unknown address");
+            }
+            return Task.CompletedTask;
         }
 
-        protected override async Task OnClientDisconnectedAsync(TcpClient client)
+        protected override Task OnClientDisconnectedAsync(TcpClient client)
         {
-            Log.Information("Client disconnected from {Address}", ((IPEndPoint)client.Client.RemoteEndPoint).Address);
+            var remoteEndPoint = client.Client.RemoteEndPoint as IPEndPoint;
+            if (remoteEndPoint != null)
+            {
+                Log.Information("Client disconnected from {Address}", remoteEndPoint.Address);
+            }
+            else
+            {
+                Log.Information("Client disconnected from unknown address");
+            }
+            return Task.CompletedTask;
         }
 
-        protected override async Task OnErrorAsync(Exception exception, string context)
+        protected override Task OnErrorAsync(Exception exception, string context)
         {
             Log.Error(exception, "Error in ProxyServer: {Context}", context);
+            return Task.CompletedTask;
         }
 
         internal void OnPacketReceived(PacketEventArgs e)

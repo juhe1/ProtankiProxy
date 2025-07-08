@@ -37,9 +37,10 @@ namespace ProtankiProxy
             _protection = protection;
         }
 
-        protected override async Task OnConnectedAsync()
+        protected override Task OnConnectedAsync()
         {
             Log.Information("Connected to ProTanki server {Server}:{Port}", _serverAddress, _serverPort);
+            return Task.CompletedTask;
         }
 
         protected override async Task OnRawPacketReceivedAsync(byte[] rawPacket)
@@ -48,29 +49,35 @@ namespace ProtankiProxy
             await _clientHandler.SendRawPacketAsync(rawPacket);
         }
 
-        protected override async Task OnPacketReceivedAsync(AbstractPacket packet)
+        protected override Task OnPacketReceivedAsync(AbstractPacket packet)
         {
             // Activate protection from client handler. We don't need to activate the protection from this class,
             // it is already activated in the base class.
-            if (packet.Id == ActivateProtection.Id)
+            if (packet.Id == ActivateProtection.IdStatic)
             {
-                var keys = (List<object>)packet.ObjectByAttributeName["keys"];
-                var intKeys = keys.Select(k => (byte)k).ToArray();
-                _clientHandler.Protection.Activate(intKeys);
+                if (packet.ObjectByAttributeName.TryGetValue("keys", out var keysObj) && keysObj is List<object> keys)
+                {
+                    var intKeys = keys.Select(k => (byte)k).ToArray();
+                    _clientHandler.Protection.Activate(intKeys);
+                }
+                // else: handle missing or invalid keys as needed
             }
             var clientHandler = (ProxyClientHandler)_clientHandler;
             var args = new PacketEventArgs(packet, _serverAddress + ":" + _serverPort, clientHandler.GetClientEndPoint());
             _proxyServer.OnPacketReceived(args);
+            return Task.CompletedTask;
         }
 
-        protected override async Task OnErrorAsync(Exception exception, string context)
+        protected override Task OnErrorAsync(Exception exception, string context)
         {
             Log.Error(exception, "Error in ProxyServerClient: {Context}", context);
+            return Task.CompletedTask;
         }
 
-        protected override async Task OnDisconnectedAsync()
+        protected override Task OnDisconnectedAsync()
         {
             Log.Information("Disconnected from server {Server}:{Port}", _serverAddress, _serverPort);
+            return Task.CompletedTask;
         }
 
         protected override Task OnPacketUnwrapFailureAsync(Type packetType, int packetId, Exception exception)

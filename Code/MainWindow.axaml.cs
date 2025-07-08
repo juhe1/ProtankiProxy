@@ -15,12 +15,12 @@ namespace ProtankiProxy;
 
 public partial class MainWindow : Window
 {
-    private ProxyServer _proxyServer;
-    private IPEndPoint _localEndPoint;
-    private IPEndPoint _serverEndPoint;
-    private ConnectionSettings _settings;
-    private PacketListPanel _packetListPanel;
-    private PacketInfoPanel _packetInfoPanel;
+    private ProxyServer? _proxyServer;
+    private IPEndPoint? _localEndPoint;
+    private IPEndPoint? _serverEndPoint;
+    private ConnectionSettings? _settings;
+    private PacketListPanel? _packetListPanel;
+    private PacketInfoPanel? _packetInfoPanel;
     private CancellationTokenSource _cancellationTokenSource;
     private PacketListViewModel _packetListViewModel;
 
@@ -32,6 +32,12 @@ public partial class MainWindow : Window
         _packetListPanel = this.FindControl<PacketListPanel>("PacketListPanel");
         _packetInfoPanel = this.FindControl<PacketInfoPanel>("PacketInfoPanel");
 
+        if (_packetListPanel is null)
+            throw new Exception("_packetListPanel cannot be null");
+
+        if (_packetInfoPanel is null)
+            throw new Exception("_packetInfoPanel cannot be null");
+
         _packetListViewModel = new PacketListViewModel();
         _packetListPanel.ManualInit(_packetListViewModel);
 
@@ -42,7 +48,7 @@ public partial class MainWindow : Window
         LoadSettings();
     }
 
-    private void OnPacketReceived(object sender, PacketEventArgs e)
+    private void OnPacketReceived(object? sender, PacketEventArgs e)
     {
         Dispatcher.UIThread.Post(() =>
         {
@@ -85,6 +91,8 @@ public partial class MainWindow : Window
     {
         try
         {
+            if (_localEndPoint == null || _serverEndPoint == null)
+                throw new InvalidOperationException("Endpoints must not be null.");
             // Create and start proxy server
             _proxyServer = new ProxyServer(
                 _localEndPoint,
@@ -106,6 +114,8 @@ public partial class MainWindow : Window
 
     private async void OnConnectionSettingsClick(object sender, RoutedEventArgs e)
     {
+        if (_settings == null)
+            throw new InvalidOperationException("Settings must not be null.");
         var settingsWindow = new ConnectionSettingsWindow(_settings);
         await settingsWindow.ShowDialog(this);
 
@@ -142,4 +152,3 @@ public partial class MainWindow : Window
         _cancellationTokenSource = new CancellationTokenSource();
     }
 }
-

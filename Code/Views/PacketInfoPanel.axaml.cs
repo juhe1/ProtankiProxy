@@ -6,9 +6,9 @@ namespace ProtankiProxy.Views
 {
     public partial class PacketInfoPanel : UserControl
     {
-        public TextBox GetPacketInfo() => this.FindControl<TextBox>("PacketInfo");
-        public TextBox GetHexView() => this.FindControl<TextBox>("HexView");
-        public TextBox GetDecryptedHexView() => this.FindControl<TextBox>("DecryptedHexView");
+        public TextBox GetPacketInfo() => this.FindControl<TextBox>("PacketInfo")!;
+        public TextBox GetHexView() => this.FindControl<TextBox>("HexView")!;
+        public TextBox GetDecryptedHexView() => this.FindControl<TextBox>("DecryptedHexView")!;
         public PacketInfoPanel()
         {
             InitializeComponent();

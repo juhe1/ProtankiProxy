@@ -6,11 +6,11 @@ namespace ProtankiProxy.Models
     public class PacketListItem
     {
         public DateTime Timestamp { get; set; }
-        public string Source { get; set; }
-        public string Destination { get; set; }
+        public string Source { get; set; } = string.Empty;
+        public string Destination { get; set; } = string.Empty;
         public int Size { get; set; }
-        public string Type { get; set; }
-        public AbstractPacket Packet { get; set; }
+        public string Type { get; set; } = string.Empty;
+        public AbstractPacket Packet { get; set; } = default!;
 
         public string TypeWithId => Packet != null ? $"{Type} (ID: {Packet.Id})" : Type;
 

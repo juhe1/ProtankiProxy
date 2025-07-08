@@ -19,10 +19,10 @@ namespace ProtankiProxy
     public class ProxyClientHandler : TankiTcpClientHandler
     {
         private readonly IPEndPoint _serverEndPoint;
-        private TankiTcpClient _serverClient;
+        private TankiTcpClient? _serverClient;
         private IPAddress _clientAddress;
         private readonly ProxyServer _proxyServer;
-        private string _clientEndPoint;
+        private string _clientEndPoint = string.Empty;
 
         /// <summary>
         /// Creates a new instance of ProxyClientHandler.
@@ -36,8 +36,17 @@ namespace ProtankiProxy
             : base(client, protection, cancellationToken)
         {
             _serverEndPoint = serverEndPoint;
-            _clientAddress = ((IPEndPoint)client.Client.RemoteEndPoint).Address;
-            _clientEndPoint = client.Client.RemoteEndPoint.ToString();
+            var remoteEndPoint = client.Client.RemoteEndPoint as IPEndPoint;
+            if (remoteEndPoint != null)
+            {
+                _clientAddress = remoteEndPoint.Address;
+                _clientEndPoint = remoteEndPoint.ToString();
+            }
+            else
+            {
+                _clientAddress = IPAddress.None;
+                _clientEndPoint = "Unknown";
+            }
             _proxyServer = proxyServer;
         }
 
@@ -80,10 +89,11 @@ namespace ProtankiProxy
         /// Raises the PacketReceived event with the packet information.
         /// </summary>
         /// <param name="packet">The received packet</param>
-        protected override async Task OnPacketReceivedAsync(AbstractPacket packet)
+        protected override Task OnPacketReceivedAsync(AbstractPacket packet)
         {
             var args = new PacketEventArgs(packet, _clientAddress.ToString(), _serverEndPoint.ToString());
             _proxyServer.OnPacketReceived(args);
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -92,9 +102,10 @@ namespace ProtankiProxy
         /// </summary>
         /// <param name="exception">The exception that occurred</param>
         /// <param name="context">The context where the error occurred</param>
-        protected override async Task OnErrorAsync(Exception exception, string context)
+        protected override Task OnErrorAsync(Exception exception, string context)
         {
             Log.Error(exception, "Error in ProxyClientHandler: {Context}", context);
+            return Task.CompletedTask;
         }
 
         /// <summary>

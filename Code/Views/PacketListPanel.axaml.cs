@@ -5,83 +5,88 @@ using ProtankiProxy.Models;
 using ProtankiProxy.ViewModels;
 using Serilog;
 
-namespace ProtankiProxy.Views
+namespace ProtankiProxy.Views;
+
+public partial class PacketListPanel : UserControl
 {
-    public partial class PacketListPanel : UserControl
+    public PacketInfoPanel? TargetPacketInfoPanel { get; set; }
+    public event Action<PacketListItem?>? PacketSelected;
+
+    public TextBox? GetPacketSearchBox() => this.FindControl<TextBox>("PacketSearchBox");
+
+    public TreeDataGrid? GetPacketList() => this.FindControl<TreeDataGrid>("PacketList")!;
+
+    public CheckBox? GetAutoScrollCheckBox() => this.FindControl<CheckBox>("AutoScrollCheckBox");
+
+    public PacketListPanel()
     {
-        public PacketInfoPanel? TargetPacketInfoPanel { get; set; }
-        public event Action<PacketListItem?>? PacketSelected;
+        InitializeComponent();
 
-        public TextBox GetPacketSearchBox() => this.FindControl<TextBox>("PacketSearchBox");
+        this.AttachedToVisualTree += OnAttachedToVisualTree;
+        TextBox? searchBox = this.GetPacketSearchBox();
+        if (searchBox is null)
+            throw new Exception("searchBox cannot be null");
+        searchBox.TextChanged += OnSearchBoxTextChanged;
+    }
 
-        public TreeDataGrid GetPacketList() => this.FindControl<TreeDataGrid>("PacketList");
+    /// <summary>
+    /// Called manually outside the class.
+    /// </summary>
+    public void ManualInit(PacketListViewModel viewModel)
+    {
+        DataContext = viewModel;
+        viewModel.FilteredPackets.CollectionChanged += OnFilteredPacketsChanged;
+    }
 
-        public CheckBox GetAutoScrollCheckBox() => this.FindControl<CheckBox>("AutoScrollCheckBox");
-
-        public PacketListPanel()
+    private void OnAttachedToVisualTree(object? sender, Avalonia.VisualTreeAttachmentEventArgs e)
+    {
+        var packetList = this.GetPacketList();
+        if (packetList == null)
         {
-            InitializeComponent();
-
-            this.AttachedToVisualTree += OnAttachedToVisualTree;
-            this.GetPacketSearchBox().TextChanged += OnSearchBoxTextChanged;
+            Console.WriteLine("ERROR: PacketList TreeDataGrid not found!");
+            return;
         }
-
-        /// <summary>
-        /// Called manually outside the class.
-        /// </summary>
-        public void ManualInit(PacketListViewModel viewModel)
+        if (DataContext is PacketListViewModel vm)
         {
-            DataContext = viewModel;
-            viewModel.FilteredPackets.CollectionChanged += OnFilteredPacketsChanged;
+            packetList.Source = vm.TreeDataGridSource;
         }
-
-        private void OnAttachedToVisualTree(
-            object? sender,
-            Avalonia.VisualTreeAttachmentEventArgs e
-        )
+        if (packetList.RowSelection == null)
         {
-            var packetList = this.GetPacketList();
-            if (packetList == null)
-            {
-                Console.WriteLine("ERROR: PacketList TreeDataGrid not found!");
-                return;
-            }
-            if (DataContext is PacketListViewModel vm)
-            {
-                packetList.Source = vm.TreeDataGridSource;
-            }
-            if (packetList.RowSelection == null)
-            {
-                Console.WriteLine(
-                    "ERROR: PacketList.RowSelection is still null after visual tree attachment!"
-                );
-                return;
-            }
-            packetList.RowSelection.SelectionChanged += OnSelectionChanged;
+            Console.WriteLine(
+                "ERROR: PacketList.RowSelection is still null after visual tree attachment!"
+            );
+            return;
         }
+        packetList.RowSelection.SelectionChanged += OnSelectionChanged;
+    }
 
-        private void OnSelectionChanged(object? sender, EventArgs e)
+    private void OnSelectionChanged(object? sender, EventArgs e)
+    {
+        var selected = GetPacketList()?.RowSelection?.SelectedItems;
+        var selectedPacket = selected?.Count > 0 ? selected[0] as PacketListItem : null;
+        PacketSelected?.Invoke(selectedPacket);
+        if (TargetPacketInfoPanel != null)
         {
-            var selected = this.GetPacketList().RowSelection.SelectedItems;
-            var selectedPacket = selected.Count > 0 ? selected[0] as PacketListItem : null;
-            PacketSelected?.Invoke(selectedPacket);
-            if (TargetPacketInfoPanel != null)
-            {
-                TargetPacketInfoPanel.DisplayPacket(selectedPacket);
-            }
+            TargetPacketInfoPanel.DisplayPacket(selectedPacket);
         }
+    }
 
-        private void OnSearchBoxTextChanged(object? sender, EventArgs e)
+    private void OnSearchBoxTextChanged(object? sender, EventArgs e)
+    {
+        if (DataContext is PacketListViewModel vm)
         {
-            if (DataContext is PacketListViewModel vm)
-                vm.ApplyFilter(this.GetPacketSearchBox().Text?.Trim() ?? string.Empty);
+            var searchBox = GetPacketSearchBox();
+            vm.ApplyFilter(searchBox?.Text?.Trim() ?? string.Empty);
         }
+    }
 
-        private void OnFilteredPacketsChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    private void OnFilteredPacketsChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (GetAutoScrollCheckBox()!.IsChecked == true)
         {
-            if (this.GetAutoScrollCheckBox().IsChecked == true)
+            var grid = GetPacketList()!;
+            if (grid.Scroll != null)
             {
-                var grid = this.GetPacketList();
                 Avalonia.Threading.Dispatcher.UIThread.Post(
                     () =>
                     {
@@ -93,4 +98,3 @@ namespace ProtankiProxy.Views
         }
     }
 }
-

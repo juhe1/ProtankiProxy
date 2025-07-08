@@ -6,7 +6,7 @@ namespace ProtankiProxy.Views
 {
     public partial class ConsolePanel : UserControl
     {
-        public TextBox GetConsoleOutput() => this.FindControl<TextBox>("ConsoleOutput");
+        public TextBox? GetConsoleOutput() => this.FindControl<TextBox>("ConsoleOutput");
         public ConsolePanel()
         {
             InitializeComponent();
@@ -22,8 +22,11 @@ namespace ProtankiProxy.Views
         public void AppendLog(string message)
         {
             var box = GetConsoleOutput();
-            box.Text += message + "\n";
-            box.CaretIndex = box.Text.Length;
+            if (box != null)
+            {
+                box.Text += message + "\n";
+                box.CaretIndex = box.Text.Length;
+            }
         }
     }
 } 
