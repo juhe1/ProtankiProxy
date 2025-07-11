@@ -53,7 +53,7 @@ namespace ProtankiProxy
         {
             // Activate protection from client handler. We don't need to activate the protection from this class,
             // it is already activated in the base class.
-            if (packet.Id == ActivateProtection.IdStatic)
+            if (packet.Id == ActivateProtection.ID_CONST)
             {
 				var keys = (List<object>?)packet.GetObjectByAttributeName("keys");
                 if (!(keys is null))
