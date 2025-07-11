@@ -55,12 +55,12 @@ namespace ProtankiProxy
             // it is already activated in the base class.
             if (packet.Id == ActivateProtection.IdStatic)
             {
-                if (packet.ObjectByAttributeName.TryGetValue("keys", out var keysObj) && keysObj is List<object> keys)
+				var keys = (List<object>?)packet.GetObjectByAttributeName("keys");
+                if (!(keys is null))
                 {
                     var intKeys = keys.Select(k => (byte)k).ToArray();
                     _clientHandler.Protection.Activate(intKeys);
                 }
-                // else: handle missing or invalid keys as needed
             }
             var clientHandler = (ProxyClientHandler)_clientHandler;
             var args = new PacketEventArgs(packet, _serverAddress + ":" + _serverPort, clientHandler.GetClientEndPoint());
