@@ -55,7 +55,7 @@ namespace ProtankiProxy
             // it is already activated in the base class.
             if (packet.Id == ActivateProtection.ID_CONST)
             {
-				var keys = (List<object>?)packet.GetObjectByAttributeName("keys");
+				var keys = (object?[]?)packet.GetObjectByAttributeName("keys");
                 if (!(keys is null))
                 {
                     var intKeys = keys.Select(k => (byte)k).ToArray();
