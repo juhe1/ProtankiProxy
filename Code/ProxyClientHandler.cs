@@ -89,7 +89,7 @@ namespace ProtankiProxy
         /// Raises the PacketReceived event with the packet information.
         /// </summary>
         /// <param name="packet">The received packet</param>
-        protected override Task OnPacketReceivedAsync(AbstractPacket packet)
+        protected override Task OnPacketReceivedAsync(Packet packet)
         {
             var args = new PacketEventArgs(packet, _clientAddress.ToString(), _serverEndPoint.ToString());
             _proxyServer.OnPacketReceived(args);

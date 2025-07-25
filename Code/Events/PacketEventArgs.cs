@@ -10,9 +10,9 @@ namespace ProtankiProxy.Events
         public string Destination { get; }
         public int Size { get; }
         public string Type { get; }
-        public AbstractPacket Packet { get; }
+        public Packet Packet { get; }
 
-        public PacketEventArgs(AbstractPacket packet, string source, string destination)
+        public PacketEventArgs(Packet packet, string source, string destination)
         {
             Timestamp = DateTime.Now;
             Source = source;

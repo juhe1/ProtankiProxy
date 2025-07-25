@@ -10,7 +10,7 @@ namespace ProtankiProxy.Models
         public string Destination { get; set; } = string.Empty;
         public int Size { get; set; }
         public string Type { get; set; } = string.Empty;
-        public AbstractPacket Packet { get; set; } = default!;
+        public Packet Packet { get; set; } = default!;
 
         public string TypeWithId => Packet != null ? $"{Type} (ID: {Packet.Id})" : Type;
 
@@ -19,4 +19,5 @@ namespace ProtankiProxy.Models
             return $"[{Timestamp:HH:mm:ss.fff}] {Source} -> {Destination} | {Type} ({Size} bytes)";
         }
     }
-} 
+}
+
