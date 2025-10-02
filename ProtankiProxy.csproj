@@ -13,7 +13,7 @@
       By changing UseLocalProject to true the ProtankiNetworking library is expected to be in ..\ProtankiNetworking\ProtankiNetworking.csproj.
       If false is used then the ProtankiNetworking nuget packet is used for building.
      -->
-		<UseLocalProject>true</UseLocalProject>
+		<UseLocalProject>false</UseLocalProject>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Avalonia" Version="11.1.1" />
